@@ -50,3 +50,6 @@ Thumbs.db
 
 # WWW folder #
 www/
+
+# Database folder #
+mysql_data/
