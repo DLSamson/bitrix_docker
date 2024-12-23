@@ -1,9 +1,11 @@
 FROM php:7.4-apache
+
 RUN apt-get update && apt-get install -y \
         libfreetype6-dev \
+        libjpeg62-turbo-dev \ 
+        libpng-dev \
         libjpeg62-turbo-dev \
         libmcrypt-dev \
-        libpng-dev \
         libonig-dev \
         libzip-dev \
         zip \
@@ -12,10 +14,13 @@ RUN apt-get update && apt-get install -y \
         screen \
         zlib1g-dev && \
         rm -r /var/lib/apt/lists/*
+
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd
+
 RUN pecl install mcrypt-1.0.5
 RUN docker-php-ext-enable mcrypt
 RUN docker-php-ext-install mysqli zip pdo pdo_mysql mbstring tokenizer iconv
-# RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
@@ -35,4 +40,3 @@ COPY revaliases.tmpl /etc/ssmtp
 COPY ssmtp.conf.tmpl /etc/ssmtp
 COPY cron_events.sh /usr/local/sbin/cron_events.sh
 CMD ["/usr/local/sbin/start.sh"]
-
